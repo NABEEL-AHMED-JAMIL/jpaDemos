@@ -1,0 +1,9 @@
+# 786
+app:
+  name: jpaDemos
+
+jwt:
+  header: Authorization
+  expires_in: 600
+  secret: ballisticPakistan
+  cookie: AUTH-TOKEN

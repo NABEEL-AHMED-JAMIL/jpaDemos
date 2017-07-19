@@ -1,6 +1,10 @@
 package com.example.jpaDemos.read.google.driver.sheet.data.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,15 +14,15 @@ import java.util.List;
 // file and put the data into the database
 @Entity
 @Table(name = "employee")
-public class Employee {
+public class Employee extends DeletableModel implements Serializable{
     //
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "eid")
     private Long eid;
-    @Column(name = "ename" , insertable = true, unique = false,nullable = false, updatable = true)
+    @Column(name = "ename",nullable = false)
     private String ename;
-    @Column(name = "salary", insertable = true, updatable = true, nullable = false)
+    @Column(name = "salary", nullable = false)
     private Double salary;
     @Column(name = "deg")
     @ElementCollection
@@ -29,13 +33,21 @@ public class Employee {
     @Column(name = "username", unique = true, nullable = false,length = 50)
     private String username;
     @Column(name = "password", unique = true, nullable = false,length = 50)
+    @Size(min = 8, max = 50)
     private String password;
     @Column(name = "age")
     private Integer age;
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "employee_authority",
+            joinColumns = @JoinColumn(name = "emp_id", referencedColumnName = "eid"),
+            inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
+    private List<Authority> authorities;
+
     public Employee() { super(); }
 
-    public Employee(Long eid, String ename, Double salary, List<String> deg, Gender gender, String username, String password, Integer age) {
+
+    public Employee(Long eid, String ename, Double salary, List<String> deg, Gender gender, String username, String password, Integer age, List<Authority> authorities) {
         this.eid = eid;
         this.ename = ename;
         this.salary = salary;
@@ -44,6 +56,7 @@ public class Employee {
         this.username = username;
         this.password = password;
         this.age = age;
+        this.authorities = authorities;
     }
 
     public Long getEid() { return eid; }
@@ -77,6 +90,11 @@ public class Employee {
     public Integer getAge() { return age; }
 
     public void setAge(Integer age) { this.age = age; }
+
+    @JsonIgnore
+    public List<Authority> getAuthorities() { return authorities; }
+
+    public void setAuthorities(List<Authority> authorities) { this.authorities = authorities; }
 
     @Override
     public String toString() {
